@@ -2,14 +2,14 @@ import Phaser from 'phaser';
 
 export default class Player extends Phaser.Physics.Arcade.Sprite
 {
-  constructor({scene, x, y })
+  constructor({ scene, x, y })
   {
     super(scene, x, y, 'player');
 
     this._allStates = ['idle', 'moving'];
     this.state = 'idle';
     this._allDirections = ['up', 'down', 'left', 'right'];
-    this.direction = 'down';
+    this.direction = 'right';
 
     this.firing = false;
     this.speed = 300;
@@ -17,6 +17,10 @@ export default class Player extends Phaser.Physics.Arcade.Sprite
     this.health = this.maxHealth;
 
     this._setAnim();
+
+    scene.add.existing(this);
+    scene.physics.add.existing(this);
+    this.setCollideWorldBounds(true);
   }
 
   handle(scene)
@@ -43,35 +47,35 @@ export default class Player extends Phaser.Physics.Arcade.Sprite
 
     scene.anims.create({
       key: 'idle-up',
-      frames: scene.anims.generateFrameNumbers('player', { start: 2, end: 3}),
+      frames: scene.anims.generateFrameNumbers('player', { start: 2, end: 3 }),
       frameRate: 6,
       repeat: -1
     });
 
     scene.anims.create({
       key: 'idle-down',
-      frames: scene.anims.generateFrameNumbers('player', { start: 4, end: 5}),
+      frames: scene.anims.generateFrameNumbers('player', { start: 4, end: 5 }),
       frameRate: 6,
       repeat: -1
     });
 
     scene.anims.create({
       key: 'walk-right',
-      frames: scene.anims.generateFrameNumbers('player', { start: 6, end: 8}),
+      frames: scene.anims.generateFrameNumbers('player', { start: 6, end: 8 }),
       frameRate: 6,
       repeat: -1
     });
 
     scene.anims.create({
       key: 'walk-up',
-      frames: scene.anims.generateFrameNumbers('player', { start: 9, end: 11}),
+      frames: scene.anims.generateFrameNumbers('player', { start: 9, end: 11 }),
       frameRate: 6,
       repeat: -1
     });
 
     scene.anims.create({
       key: 'walk-down',
-      frames: scene.anims.generateFrameNumbers('player', { start: 12, end: 14}),
+      frames: scene.anims.generateFrameNumbers('player', { start: 12, end: 14 }),
       frameRate: 6,
       repeat: -1
     });
@@ -126,6 +130,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite
     let controller = scene.game.controller;
 
     this.state = 'idle';
+    this.firng = false;
     this.setVelocityX(0);
     this.setVelocityY(0);
     for(let command of controller.poll())
@@ -152,6 +157,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite
 
       if(command.startsWith('AIM_'))
       {
+        this.firing = true;
         switch (command)
         {
           case 'AIM_UP':
