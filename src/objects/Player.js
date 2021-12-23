@@ -1,5 +1,7 @@
 import Phaser from 'phaser';
 
+import Flamethrower from './Flamethrower';
+
 export default class Player extends Phaser.Physics.Arcade.Sprite
 {
   constructor({ scene, x, y })
@@ -11,7 +13,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite
     this._allDirections = ['up', 'down', 'left', 'right'];
     this.direction = 'right';
 
-    this.firing = false;
+    this.flamethrower = new Flamethrower({ scene: scene, x: x, y: y, player: this });
     this.speed = 300;
     this.maxHealth = 100;
     this.health = this.maxHealth;
@@ -33,6 +35,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite
     {
       this._setAnim();
     }
+
+    this.flamethrower.handle(scene);
 
   }
 
@@ -130,7 +134,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite
     let controller = scene.game.controller;
 
     this.state = 'idle';
-    this.firng = false;
+    this.flamethrower.setFiring(false);
     this.setVelocityX(0);
     this.setVelocityY(0);
     for(let command of controller.poll())
@@ -157,7 +161,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite
 
       if(command.startsWith('AIM_'))
       {
-        this.firing = true;
+        this.flamethrower.setFiring(true);
         switch (command)
         {
           case 'AIM_UP':

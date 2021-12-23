@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 
 import Player from '../objects/Player';
 import Campfire from '../objects/Campfire';
+import Flamethrower from '../objects/Flamethrower';
 
 /**
  * Preload state is responsible for loading in assets.
@@ -31,12 +32,18 @@ export default class PreloadScene extends Phaser.Scene
       'assets/campfire.png',
       { frameWidth: 64, frameHeight: 64 }
     );
+    this.load.spritesheet(
+      'flamethrower_fire',
+      'assets/flamethrower_fire.png',
+      { frameWidth: 96, frameHeight: 32 }
+    );
   }
 
   create ()
   {
     Player.loadAnims(this);
     Campfire.loadAnims(this);
+    Flamethrower.loadAnims(this);
     this.scene.start('main');
   }
 }
