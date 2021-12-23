@@ -3,6 +3,8 @@ import Phaser from 'phaser';
 import Player from '../objects/Player';
 
 import RoseEnemy from '../objects/enemies/RoseEnemy';
+import TreeEnemy from '../objects/enemies/TreeEnemy';
+import BoxEnemy from '../objects/enemies/BoxEnemy';
 
 import Campfire from '../objects/Campfire';
 
@@ -32,7 +34,11 @@ export default class MainScene extends Phaser.Scene
     // Midground; player, items, and enemies are placed here.
     this.initGameStateObj();
     let e = new RoseEnemy({ scene: this, x: 75, y: 300 });
+    let t = new TreeEnemy({ scene: this, x: 720, y: 300 });
+    let b = new BoxEnemy({ scene: this, x: 300, y: 80 });
     this.gameStateObj.enemies.add(e);
+    this.gameStateObj.enemies.add(t);
+    this.gameStateObj.enemies.add(b);
 
     // Add foreground sprites.
     this.foreground = this.add.group();

@@ -78,21 +78,21 @@ export default class Player extends Character
     scene.anims.create({
       key: 'walk-right',
       frames: scene.anims.generateFrameNumbers('player', { start: 6, end: 8 }),
-      frameRate: 6,
+      frameRate: 12,
       repeat: -1
     });
 
     scene.anims.create({
       key: 'walk-up',
       frames: scene.anims.generateFrameNumbers('player', { start: 9, end: 11 }),
-      frameRate: 6,
+      frameRate: 12,
       repeat: -1
     });
 
     scene.anims.create({
       key: 'walk-down',
       frames: scene.anims.generateFrameNumbers('player', { start: 12, end: 14 }),
-      frameRate: 6,
+      frameRate: 12,
       repeat: -1
     });
   }

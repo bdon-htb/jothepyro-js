@@ -43,10 +43,15 @@ export default class Character extends Phaser.Physics.Arcade.Sprite
 
   /**
    * The handle method is effectively the character's game update method.
-   * @abstract
+   * The player has its own handle method so we'll just make this the default
+   * for enemies.
    * @param { Phaser.Scene } scene - The scene the character is currently in.
   */
-  handle(scene){ }
+  handle(scene)
+  {
+    this._follow(scene, scene.gameStateObj.player);
+    this._setFlipX();
+  }
 
   /**
    * Loads in assets (i.e. sprites) specific to the character.
@@ -91,7 +96,7 @@ export default class Character extends Phaser.Physics.Arcade.Sprite
     this.setVelocityX(0);
     this.setVelocityY(0);
 
-    // Prevents awkward overshooting + shaking to compensate.
+    // Prevents awkward overshooting and shaking.
     let velocityX = Math.min(this.speed, Math.abs(waypoint.x - currentPos.x));
     let velocityY = Math.min(this.speed, Math.abs(waypoint.y - currentPos.y));
 

@@ -3,13 +3,17 @@ import Phaser from 'phaser';
 import Player from '../objects/Player';
 
 import RoseEnemy from '../objects/enemies/RoseEnemy';
+import TreeEnemy from '../objects/enemies/TreeEnemy';
+import BoxEnemy from '../objects/enemies/BoxEnemy';
 
 import Campfire from '../objects/Campfire';
 import Flamethrower from '../objects/Flamethrower';
 
 const CHARACTERS = [
   Player,
-  RoseEnemy
+  RoseEnemy,
+  TreeEnemy,
+  BoxEnemy
 ]
 
 /**
@@ -49,19 +53,9 @@ export default class PreloadScene extends Phaser.Scene
       { frameWidth: 38, frameHeight: 64 }
     );
     this.load.spritesheet(
-      'tree_enemy',
-      'assets/enemies/tree_enemy.png',
-      { frameWidth: 96, frameHeight: 96 }
-    );
-    this.load.spritesheet(
       'watermelon_enemy',
       'assets/enemies/watermelon_enemy.png',
       { frameWidth: 32, frameHeight: 32 }
-    );
-    this.load.spritesheet(
-      'box_enemy',
-      'assets/enemies/box_enemy.png',
-      { frameWidth: 64, frameHeight: 64 }
     );
   }
 
