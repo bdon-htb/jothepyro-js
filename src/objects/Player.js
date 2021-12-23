@@ -1,8 +1,13 @@
 import Phaser from 'phaser';
 
 import Flamethrower from './Flamethrower';
+import Character from './Character';
 
-export default class Player extends Phaser.Physics.Arcade.Sprite
+/**
+ * The player character.
+ * @extends Character
+*/
+export default class Player extends Character
 {
   constructor({ scene, x, y })
   {
@@ -14,15 +19,13 @@ export default class Player extends Phaser.Physics.Arcade.Sprite
     this.direction = 'right';
 
     this.flamethrower = new Flamethrower({ scene: scene, x: x, y: y, player: this });
+
+    // These are the default values of the Character class.
+    // But i'll leave them here anyways.
     this.speed = 300;
-    this.maxHealth = 100;
-    this.health = this.maxHealth;
+    this.setMaxHealth(100);
 
     this._setAnim();
-
-    scene.add.existing(this);
-    scene.physics.add.existing(this);
-    this.setCollideWorldBounds(true);
   }
 
   handle(scene)
@@ -38,6 +41,15 @@ export default class Player extends Phaser.Physics.Arcade.Sprite
 
     this.flamethrower.handle(scene);
 
+  }
+
+  static loadAssets(scene)
+  {
+    scene.load.spritesheet(
+      'player',
+      'assets/player.png',
+      { frameWidth: 32, frameHeight: 32 }
+    );
   }
 
   static loadAnims(scene)
@@ -181,4 +193,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite
     }
     this.flamethrower.setFiring(firing);
   }
+
+  // Overriding to do nothing because the player shouldn't have follow behaviour ever.
+  _follow(scene, c){ }
 }

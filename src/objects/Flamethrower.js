@@ -98,8 +98,8 @@ export default class Flamethrower extends Phaser.Physics.Arcade.Sprite
       let position = this.player.getTopLeft();
 
       // Don't try to think about these values too much.
-      // I based them on the og code and they looked pretty arbitrary there
-      // at a glance.
+      // I based them on the og code and they looked pretty arbitrary
+      // at a quick glance.
       // Rotation also messes with the positioning I think too so we
       // gotta account for that as well.
       switch (this.player.direction)
@@ -112,7 +112,7 @@ export default class Flamethrower extends Phaser.Physics.Arcade.Sprite
           position.y += 32;
           break;
         case 'left':
-          position.x -= 95;
+          position.x -= 96;
           position.y += 3;
           break;
         default: // right.
