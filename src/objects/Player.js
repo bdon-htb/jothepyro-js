@@ -132,9 +132,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite
   _handlePlayerControls(scene)
   {
     let controller = scene.game.controller;
+    let firing = false;
 
     this.state = 'idle';
-    this.flamethrower.setFiring(false);
     this.setVelocityX(0);
     this.setVelocityY(0);
     for(let command of controller.poll())
@@ -161,7 +161,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite
 
       if(command.startsWith('AIM_'))
       {
-        this.flamethrower.setFiring(true);
+        firing = true;
         switch (command)
         {
           case 'AIM_UP':
@@ -179,5 +179,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite
         }
       }
     }
+    this.flamethrower.setFiring(firing);
   }
 }

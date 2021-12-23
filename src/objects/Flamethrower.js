@@ -10,8 +10,6 @@ export default class Flamethrower extends Phaser.Physics.Arcade.Sprite
     this.player = player;
     this.firing = false;
 
-    this.chain('flamethrower_startup', 'flamethrower_firing');
-
     scene.add.existing(this);
     scene.physics.add.existing(this);
 
@@ -42,7 +40,14 @@ export default class Flamethrower extends Phaser.Physics.Arcade.Sprite
     // Turning on.
     if(this.firing === false && b === true)
     {
-      this.anims.play('flamethrower_startup', true);
+      this.anims.play('flamethrower_startup');
+      this.anims.chain('flamethrower_firing');
+    }
+    // Turning off.
+    else if(this.firing === true && b === false)
+    {
+      this.anims.chain();
+      this.anims.stop();
     }
 
     this.firing = b;
@@ -53,14 +58,14 @@ export default class Flamethrower extends Phaser.Physics.Arcade.Sprite
     scene.anims.create({
       key: 'flamethrower_startup',
       frames: scene.anims.generateFrameNumbers('flamethrower_fire', { start: 0, end: 2 }),
-      frameRate: 6,
+      frameRate: 60,
       repeat: 0
     });
 
     scene.anims.create({
       key: 'flamethrower_firing',
       frames: scene.anims.generateFrameNumbers('flamethrower_fire', { start: 3, end: 5 }),
-      frameRate: 6,
+      frameRate: 30,
       repeat: -1
     });
   }
@@ -91,23 +96,28 @@ export default class Flamethrower extends Phaser.Physics.Arcade.Sprite
     _updatePosition()
     {
       let position = this.player.getTopLeft();
+
+      // Don't try to think about these values too much.
+      // I based them on the og code and they looked pretty arbitrary there
+      // at a glance.
+      // Rotation also messes with the positioning I think too so we
+      // gotta account for that as well.
       switch (this.player.direction)
       {
         case 'up':
-          position.x += (this.width / 4) - 24;
-          position.y -= this.width;
+          // Current position is fine.
           break;
         case 'down':
-          position.x += (this.width / 4) - 24;
-          position.y += (this.width / 2) - 16;
+          position.x += 32;
+          position.y += 32;
           break;
         case 'left':
           position.x -= 95;
-          position.y += (this.height / 2) - 13;
+          position.y += 3;
           break;
         default: // right.
           position.x += 32;
-          position.y += (this.height / 2) - 13;
+          position.y += 3;
         }
       this.setPosition(position.x, position.y);
     }
