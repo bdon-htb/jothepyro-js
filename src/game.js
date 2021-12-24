@@ -1,8 +1,17 @@
 import Phaser from 'phaser';
 
+// Scenes.
 import PreloadScene from '/scenes/PreloadScene';
 import MainScene from '/scenes/MainScene';
 
+// Characters.
+import Player from '/objects/Player';
+import RoseEnemy from '/objects/enemies/RoseEnemy';
+import TreeEnemy from '/objects/enemies/TreeEnemy';
+import BoxEnemy from '/objects/enemies/BoxEnemy';
+import SunflowerEnemy from '/objects/enemies/SunflowerEnemy';
+
+// Custom components.
 import Controller from '/objects/Controller';
 
 class JoThePyro extends Phaser.Game
@@ -20,6 +29,15 @@ class JoThePyro extends Phaser.Game
     });
 
     this.controller = new Controller(this);
+
+    // A reference to all the existing character classes.
+    this.characters = {
+      Player: Player,
+      RoseEnemy: RoseEnemy,
+      TreeEnemy: TreeEnemy,
+      BoxEnemy: BoxEnemy,
+      SunflowerEnemy: SunflowerEnemy
+    }
 
   }
 }

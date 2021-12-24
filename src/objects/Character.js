@@ -97,8 +97,8 @@ export default class Character extends Phaser.Physics.Arcade.Sprite
     this.setVelocityY(0);
 
     // Prevents awkward overshooting and shaking.
-    let velocityX = Math.min(this.speed, Math.abs(waypoint.x - currentPos.x));
-    let velocityY = Math.min(this.speed, Math.abs(waypoint.y - currentPos.y));
+    let velocityX = Math.min(this.speed, Math.abs(waypoint.x - currentPos.x) * scene.game.loop.delta);
+    let velocityY = Math.min(this.speed, Math.abs(waypoint.y - currentPos.y) * scene.game.loop.delta);
 
     // Horizontal movement.
     if(waypoint.x > currentPos.x)
