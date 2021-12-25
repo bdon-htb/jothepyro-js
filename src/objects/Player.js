@@ -13,6 +13,7 @@ export default class Player extends Character
   {
     super(scene, x, y, 'player');
 
+    this.isEnemy = false;
     this._allStates = ['idle', 'moving'];
     this.state = 'idle';
     this._allDirections = ['up', 'down', 'left', 'right'];
@@ -26,6 +27,10 @@ export default class Player extends Character
     this.setMaxHealth(100);
 
     this._setAnim();
+
+    scene.add.existing(this);
+    scene.physics.add.existing(this);
+    this.setCollideWorldBounds(true);
   }
 
   handle(scene)
@@ -103,7 +108,7 @@ export default class Player extends Character
     this.flipX = false;
     if(this.state === 'idle')
     {
-      switch (this.direction)
+      switch(this.direction)
       {
         case 'up':
           animation = 'idle-up'
@@ -121,7 +126,7 @@ export default class Player extends Character
       }
     }
     else {
-      switch (this.direction)
+      switch(this.direction)
       {
         case 'up':
           animation = 'walk-up'
@@ -174,7 +179,7 @@ export default class Player extends Character
       if(command.startsWith('AIM_'))
       {
         firing = true;
-        switch (command)
+        switch(command)
         {
           case 'AIM_UP':
             this.direction = 'up';

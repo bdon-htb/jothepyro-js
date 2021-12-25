@@ -84,7 +84,8 @@ export default class Controller
       'RIGHT': 'AIM_RIGHT'
     }
 
-    for(const [key, value] of Object.entries(keys)){
+    for(const [key, value] of Object.entries(keys))
+    {
       this.scene.input.keyboard.on(`keydown-${key}`, () => this._addCommand(value));
       this.scene.input.keyboard.on(`keyup-${key}`, () => this._removeCommand(value));
     }

@@ -28,7 +28,7 @@ export default class TreeEnemy extends Character
     scene.anims.create({
       key: 'tree_enemy_move',
       frames: scene.anims.generateFrameNumbers('tree_enemy', { start: 0, end: 5 }),
-      frameRate: 6,
+      frameRate: 12,
       repeat: -1
     });
   }

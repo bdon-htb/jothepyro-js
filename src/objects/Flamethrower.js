@@ -102,7 +102,7 @@ export default class Flamethrower extends Phaser.Physics.Arcade.Sprite
       // at a quick glance.
       // Rotation also messes with the positioning I think too so we
       // gotta account for that as well.
-      switch (this.player.direction)
+      switch(this.player.direction)
       {
         case 'up':
           // Current position is fine.

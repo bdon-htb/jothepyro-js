@@ -11,15 +11,13 @@ export default class SunflowerEnemy extends Character
     this.speed = 330;
     this.setMaxHealth(45);
 
+    this.sprinting = false;    
     this.sprintTimer = new Phaser.Time.TimerEvent({
       delay: 250,
       callback: ( () => this.sprinting = !this.sprinting ),
       repeat: -1
     });
-
     scene.time.addEvent(this.sprintTimer);
-
-    this.sprinting = false;
 
     this.anims.play('sunflower_enemy_move', true);
   }

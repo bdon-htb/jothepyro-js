@@ -17,15 +17,13 @@ export default class Character extends Phaser.Physics.Arcade.Sprite
   {
     super(scene, x, y, texture);
 
+    this.isEnemy = true;
+
     this._allDirections = ['left', 'right'];
     this.direction = 'right';
 
     this.speed = 300;
     this.setMaxHealth(100);
-
-    scene.add.existing(this);
-    scene.physics.add.existing(this);
-    this.setCollideWorldBounds(true);
   }
 
 
