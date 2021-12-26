@@ -41,6 +41,9 @@ export default class PreloadScene extends Phaser.Scene
       'assets/enemies/watermelon_enemy.png',
       { frameWidth: 32, frameHeight: 32 }
     );
+
+    this.load.atlas('ui', 'assets/ui/ui.png', 'assets/ui/ui.json');
+    // this.load.atlas('items', 'assets/items/items.png', 'assets/items/ui.items');
   }
 
   create ()

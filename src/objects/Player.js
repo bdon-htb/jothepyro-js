@@ -19,6 +19,7 @@ export default class Player extends Character
     this._allDirections = ['up', 'down', 'left', 'right'];
     this.direction = 'right';
 
+    this.firing = false;
     this.flamethrower = new Flamethrower({ scene: scene, x: x, y: y, player: this });
 
     // These are the default values of the Character class.
@@ -30,6 +31,7 @@ export default class Player extends Character
 
     scene.add.existing(this);
     scene.physics.add.existing(this);
+    this.body.pushable = false;
     this.setCollideWorldBounds(true);
   }
 
@@ -196,7 +198,8 @@ export default class Player extends Character
         }
       }
     }
-    this.flamethrower.setFiring(firing);
+
+    this.firing = firing;
   }
 
   // Overriding to do nothing because the player shouldn't have follow behaviour ever.

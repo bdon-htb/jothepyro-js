@@ -31,7 +31,7 @@ class JoThePyro extends Phaser.Game
 
     this.controller = new Controller(this);
 
-    // A reference to all the existing character classes.
+    // Create a reference to all the existing character classes.
     this.characters = {
       Player: Player,
       RoseEnemy: RoseEnemy,

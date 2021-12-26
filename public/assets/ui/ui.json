@@ -1,0 +1,460 @@
+{
+	"textures": [
+		{
+			"image": "texture",
+			"format": "RGBA8888",
+			"size": {
+				"w": 1596,
+				"h": 1500
+			},
+			"scale": 1,
+			"frames": [
+				{
+					"filename": "healthfuelscore_help.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 700,
+						"h": 500
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 700,
+						"h": 500
+					},
+					"frame": {
+						"x": 0,
+						"y": 0,
+						"w": 700,
+						"h": 500
+					}
+				},
+				{
+					"filename": "controls_help.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 700,
+						"h": 500
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 700,
+						"h": 500
+					},
+					"frame": {
+						"x": 0,
+						"y": 500,
+						"w": 700,
+						"h": 500
+					}
+				},
+				{
+					"filename": "credits.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 700,
+						"h": 500
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 700,
+						"h": 500
+					},
+					"frame": {
+						"x": 700,
+						"y": 0,
+						"w": 700,
+						"h": 500
+					}
+				},
+				{
+					"filename": "enemies_help.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 700,
+						"h": 500
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 700,
+						"h": 500
+					},
+					"frame": {
+						"x": 700,
+						"y": 500,
+						"w": 700,
+						"h": 500
+					}
+				},
+				{
+					"filename": "items_help.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 700,
+						"h": 500
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 700,
+						"h": 500
+					},
+					"frame": {
+						"x": 0,
+						"y": 1000,
+						"w": 700,
+						"h": 500
+					}
+				},
+				{
+					"filename": "title_logo.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 600,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 600,
+						"h": 300
+					},
+					"frame": {
+						"x": 700,
+						"y": 1000,
+						"w": 600,
+						"h": 300
+					}
+				},
+				{
+					"filename": "game_over.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 296,
+						"h": 82
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 296,
+						"h": 82
+					},
+					"frame": {
+						"x": 700,
+						"y": 1300,
+						"w": 296,
+						"h": 82
+					}
+				},
+				{
+					"filename": "company_logo.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 211,
+						"h": 65
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 211,
+						"h": 65
+					},
+					"frame": {
+						"x": 996,
+						"y": 1300,
+						"w": 211,
+						"h": 65
+					}
+				},
+				{
+					"filename": "fuelbar.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 200,
+						"h": 60
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 200,
+						"h": 60
+					},
+					"frame": {
+						"x": 996,
+						"y": 1365,
+						"w": 200,
+						"h": 60
+					}
+				},
+				{
+					"filename": "healthbar.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 200,
+						"h": 60
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 200,
+						"h": 60
+					},
+					"frame": {
+						"x": 1196,
+						"y": 1365,
+						"w": 200,
+						"h": 60
+					}
+				},
+				{
+					"filename": "credits_button.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 200,
+						"h": 50
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 200,
+						"h": 50
+					},
+					"frame": {
+						"x": 700,
+						"y": 1382,
+						"w": 200,
+						"h": 50
+					}
+				},
+				{
+					"filename": "help.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 200,
+						"h": 50
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 200,
+						"h": 50
+					},
+					"frame": {
+						"x": 900,
+						"y": 1425,
+						"w": 200,
+						"h": 50
+					}
+				},
+				{
+					"filename": "back.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 200,
+						"h": 50
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 200,
+						"h": 50
+					},
+					"frame": {
+						"x": 700,
+						"y": 1432,
+						"w": 200,
+						"h": 50
+					}
+				},
+				{
+					"filename": "start.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 200,
+						"h": 50
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 200,
+						"h": 50
+					},
+					"frame": {
+						"x": 1100,
+						"y": 1425,
+						"w": 200,
+						"h": 50
+					}
+				},
+				{
+					"filename": "mainmenu.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 200,
+						"h": 50
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 200,
+						"h": 50
+					},
+					"frame": {
+						"x": 1300,
+						"y": 1425,
+						"w": 200,
+						"h": 50
+					}
+				},
+				{
+					"filename": "next.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 200,
+						"h": 50
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 200,
+						"h": 50
+					},
+					"frame": {
+						"x": 1207,
+						"y": 1300,
+						"w": 200,
+						"h": 50
+					}
+				},
+				{
+					"filename": "quit.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 200,
+						"h": 50
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 200,
+						"h": 50
+					},
+					"frame": {
+						"x": 1396,
+						"y": 1350,
+						"w": 200,
+						"h": 50
+					}
+				},
+				{
+					"filename": "tryagain.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 200,
+						"h": 50
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 200,
+						"h": 50
+					},
+					"frame": {
+						"x": 1300,
+						"y": 1000,
+						"w": 200,
+						"h": 50
+					}
+				},
+				{
+					"filename": "score.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 150,
+						"h": 50
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 150,
+						"h": 50
+					},
+					"frame": {
+						"x": 1407,
+						"y": 1050,
+						"w": 150,
+						"h": 50
+					}
+				},
+				{
+					"filename": "killstreak.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 128,
+						"h": 29
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 128,
+						"h": 29
+					},
+					"frame": {
+						"x": 1407,
+						"y": 1100,
+						"w": 128,
+						"h": 29
+					}
+				},
+				{
+					"filename": "emptybar.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 112,
+						"h": 32
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 112,
+						"h": 32
+					},
+					"frame": {
+						"x": 1407,
+						"y": 1129,
+						"w": 112,
+						"h": 32
+					}
+				}
+			]
+		}
+	],
+	"meta": {
+		"app": "http://free-tex-packer.com",
+		"version": "0.6.7"
+	}
+}

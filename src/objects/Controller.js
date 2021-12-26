@@ -6,7 +6,7 @@ export default class Controller
   constructor(game)
   {
     this.game = game;
-    // Reference to current scene. Set in init().
+    // Reference to current scene; set in init().
     this.scene;
 
     // Complete list of all commands.

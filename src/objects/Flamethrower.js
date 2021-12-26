@@ -8,17 +8,28 @@ export default class Flamethrower extends Phaser.Physics.Arcade.Sprite
 
     this.direction = player.direction;
     this.player = player;
-    this.firing = false;
+
+    this.active = false;
+    this.maxFuel = 100;
+    this.fuel = this.maxFuel;
 
     scene.add.existing(this);
     scene.physics.add.existing(this);
+
+    this.fuelTimerConfig = {
+      delay: 17,
+      callback: ( () => this._updateFuel(scene) ),
+      repeat: -1
+    }
+    this.fuelTimer = new Phaser.Time.TimerEvent(this.fuelTimerConfig);
+    scene.time.addEvent(this.fuelTimer);
 
     this.setOrigin(0,0);
   }
 
   handle(scene)
   {
-    this.setVisible(this.isFiring());
+    this.setVisible(this._isActive());
 
     this._updatePosition();
 
@@ -30,27 +41,27 @@ export default class Flamethrower extends Phaser.Physics.Arcade.Sprite
     this.direction = this.player.direction;
   }
 
-  isFiring()
+  _isActive()
   {
-    return this.firing;
+    return this.active;
   }
 
-  setFiring(b)
+  _setActive(b)
   {
     // Turning on.
-    if(this.firing === false && b === true)
+    if(this.active === false && b === true)
     {
       this.anims.play('flamethrower_startup');
       this.anims.chain('flamethrower_firing');
     }
     // Turning off.
-    else if(this.firing === true && b === false)
+    else if(this.active === true && b === false)
     {
       this.anims.chain();
       this.anims.stop();
     }
 
-    this.firing = b;
+    this.active = b;
   }
 
   static loadAnims(scene)
@@ -120,5 +131,26 @@ export default class Flamethrower extends Phaser.Physics.Arcade.Sprite
           position.y += 3;
         }
       this.setPosition(position.x, position.y);
+    }
+
+    _updateFuel(scene)
+    {
+      let newAmount = this.fuel;
+      if(this.player.firing && this.fuel > 0)
+      {
+        newAmount = Math.max(this.fuel - 0.2, 0);
+      }
+      else if(!this.player.firing && this.fuel < this.maxFuel)
+      {
+        newAmount = Math.min(this.fuel + 0.075, this.maxFuel);
+      }
+
+      if(newAmount != this.fuel)
+      {
+        this.fuel = newAmount;
+        scene.gameStateObj.fuelBar.setValue(newAmount);
+      }
+
+      this._setActive(this.fuel > 0 && this.player.firing);
     }
 }

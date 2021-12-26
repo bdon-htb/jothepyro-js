@@ -88,11 +88,18 @@ export default class Character extends Phaser.Physics.Arcade.Sprite
   */
   _follow(scene, c)
   {
-    let currentPos = this.getCenter();
-    let waypoint = c.getCenter();
 
     this.setVelocityX(0);
     this.setVelocityY(0);
+
+    // Touching the player.
+    if(this.isEnemy && !this.body.touching.none)
+    {
+      return;
+    }
+
+    let currentPos = this.getCenter();
+    let waypoint = c.getCenter();
 
     // Prevents awkward overshooting and shaking.
     let velocityX = Math.min(this.speed, Math.abs(waypoint.x - currentPos.x) * scene.game.loop.delta);

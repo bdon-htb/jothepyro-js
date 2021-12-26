@@ -67,7 +67,6 @@ export default class WatermelonEnemy extends Character
     else {
       if(!previous.firing) // turning on.
       {
-        console.log('on')
         scene.time.addEvent(this.fireTimer);
       }
 
@@ -219,5 +218,6 @@ export default class WatermelonEnemy extends Character
     }
 
     let p = scene.setProjectile(position.x, position.y, 'watermelon_seed', strength, velocityX, velocityY);
+    p.setFrame(textureFrame);
   }
 }
