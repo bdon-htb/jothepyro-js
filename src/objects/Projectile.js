@@ -8,8 +8,15 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite
     this.activate();
 
     this.strength;
+    this.collider;
 
     this.setStrength(strength);
+    this.setCollider(null);
+  }
+
+  getStrength()
+  {
+    return this.strength;
   }
 
   setStrength(s)
@@ -27,5 +34,25 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite
   {
     this.setActive(false);
     this.setVisible(false);
+    this.destroyCollider();
+  }
+
+  getCollider()
+  {
+    return this.collider;
+  }
+
+  setCollider(c)
+  {
+    this.collider = c;
+  }
+
+  destroyCollider()
+  {
+    if(this.collider != null)
+    {
+      this.collider.destroy();
+      this.collider = null;
+    }
   }
 }

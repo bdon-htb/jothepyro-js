@@ -8,6 +8,7 @@ export default class BoxEnemy extends Character
   {
     super(scene, x, y, 'box_enemy');
 
+    this.strength = 0.1
     this.speed = 720;
     this.setMaxHealth(10);
 

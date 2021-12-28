@@ -4,6 +4,8 @@ import Phaser from 'phaser';
  * The base class for all game characters. This includes all enemies and the
  * the player.
  * @abstract
+ * Note: This class and its children often assumes that the scene being passed
+ * is MainScene and has access to its attributes.
 */
 export default class Character extends Phaser.Physics.Arcade.Sprite
 {
@@ -18,6 +20,7 @@ export default class Character extends Phaser.Physics.Arcade.Sprite
     super(scene, x, y, texture);
 
     this.isEnemy = true;
+    this.strength = 1;
 
     this._allDirections = ['left', 'right'];
     this.direction = 'right';
@@ -37,6 +40,16 @@ export default class Character extends Phaser.Physics.Arcade.Sprite
   {
     this.maxHealth = v;
     if(resetHealth){ this.health = v; }
+  }
+
+  subtractHealth(v)
+  {
+    this.health = Math.max(0, this.health - v);
+  }
+
+  addHealth(v)
+  {
+    this.health = Math.min(this.maxHealth, this.health + 1);
   }
 
   /**

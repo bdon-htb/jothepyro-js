@@ -8,6 +8,7 @@ export default class TreeEnemy extends Character
   {
     super(scene, x, y, 'tree_enemy');
 
+    this.strength = 5;
     this.speed = 6;
     this.setMaxHealth(250);
 

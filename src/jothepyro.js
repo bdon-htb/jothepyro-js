@@ -24,7 +24,8 @@ class JoThePyro extends Phaser.Game
       width: 800,
       height: 600,
       physics: {
-        default: 'arcade'
+        default: 'arcade',
+        arcade : { debug: true }
       },
       scene: [PreloadScene, MainScene]
     });

@@ -29,10 +29,10 @@ export default class MainScene extends Phaser.Scene
     this.initGameStateObj();
 
     // Debug stuff.
-    this.spawnEnemy(new this.game.characters.RoseEnemy({ scene: this, x: 75, y: 300 }));
-    this.spawnEnemy(new this.game.characters.TreeEnemy({ scene: this, x: 720, y: 300 }));
-    this.spawnEnemy(new this.game.characters.BoxEnemy({ scene: this, x: 300, y: 80 }));
-    this.spawnEnemy(new this.game.characters.SunflowerEnemy({ scene: this, x: 300, y: 400 }));
+    // this.spawnEnemy(new this.game.characters.RoseEnemy({ scene: this, x: 75, y: 300 }));
+    // this.spawnEnemy(new this.game.characters.TreeEnemy({ scene: this, x: 720, y: 300 }));
+    // this.spawnEnemy(new this.game.characters.BoxEnemy({ scene: this, x: 300, y: 80 }));
+    // this.spawnEnemy(new this.game.characters.SunflowerEnemy({ scene: this, x: 300, y: 400 }));
     this.spawnEnemy(new this.game.characters.WatermelonEnemy({ scene: this, x: 500, y: 500 }));
 
     // Add foreground components.
@@ -44,24 +44,45 @@ export default class MainScene extends Phaser.Scene
     // for collision detection.
     // this.physics.world.on('overlap', this.handleOverlap)
     this.physics.world.on('worldbounds', this.handleBoundCollision);
+
+    this.damageTimerConfig = {
+      delay: 17,
+      callback: ( () => this.checkDamage() ),
+      repeat: -1
+    }
+    this.damageTimer = new Phaser.Time.TimerEvent(this.damageTimerConfig);
+    this.time.addEvent(this.damageTimer);
   }
 
   update()
   {
     this.gameStateObj.player.handle(this);
+    this.gameStateObj.healthBar.setValue(this.gameStateObj.player.health);
     for(const enemy of this.gameStateObj.enemies.children.getArray())
     {
       enemy.handle(this);
+      enemy.healthBar.setValue(enemy.health);
+      enemy.healthBar.setPosition(enemy.body.left, enemy.body.top - 15);
     }
   }
 
-  spawnEnemy(e)
+  spawnEnemy(enemy)
   {
-    this.gameStateObj.enemies.add(e, true);
-    e.setCollideWorldBounds(true);
-    this.physics.add.existing(e);
-    e.body.pushable = false;
-    this.physics.add.collider(e, this.gameStateObj.player);
+    this.gameStateObj.enemies.add(enemy, true);
+    this.physics.add.existing(enemy);
+
+    enemy.setCollideWorldBounds(true);
+    enemy.body.pushable = false;
+
+    enemy.touchingPlayer = false;
+    enemy.touchingFlamethrower = false;
+
+    this.physics.add.collider(enemy, this.gameStateObj.player,
+      () => {enemy.touchingPlayer = true; });
+
+    enemy.healthBar = new HealthBar(
+      this, enemy.body.left, enemy.body.top - 15, enemy.width, 10, enemy.health);
+    this.add.existing(enemy.healthBar, true);
   }
 
   setProjectile(x, y, texture, strength, velocityX, velocityY)
@@ -79,9 +100,18 @@ export default class MainScene extends Phaser.Scene
       p.setStrength(strength);
       p.activate();
     }
+
     p.setVelocity(velocityX, velocityY);
     p.body.onWorldBounds = true;
     p.setCollideWorldBounds(true);
+
+    let c = this.physics.add.collider(p, this.gameStateObj.player,
+      () => {
+        this.gameStateObj.player.subtractHealth(p.getStrength());
+        p.deactivate();
+      });
+
+      p.setCollider(c);
     return p;
   }
 
@@ -127,23 +157,6 @@ export default class MainScene extends Phaser.Scene
     }
   }
 
-/*
-  getPlayerRaycast(x, y, velocityX, velocityY)
-  {
-    let enemies = this.gameStateObj.enemies.children();
-    this.raycaster.mapGameObjects(enemies);
-
-    // Conceptually slow calculations but that probably doesn't matter all too much right?
-    let angle = Math.atan2(velocityY, velocityX);
-    let range = Math.sqrt((velocityX ** 2) + (velocityY ** 2));
-
-    this.ray.setRay(x, y, angle, range);
-    let intersection = this.ray.cast();
-
-    this.raycaster.removeMappedObjects(enemies);
-  }
-*/
-
   handleBoundCollision(body)
   {
     if(body.gameObject instanceof Projectile)
@@ -151,4 +164,39 @@ export default class MainScene extends Phaser.Scene
       body.gameObject.deactivate();
     }
   }
+
+  checkDamage()
+  {
+    let player = this.gameStateObj.player;
+    let flamethrower = this.gameStateObj.player.flamethrower;
+    let enemies = this.gameStateObj.enemies.children.getArray();
+
+    for(const enemy of enemies)
+    {
+      if(enemy.touchingPlayer)
+      {
+        this.gameStateObj.player.subtractHealth(enemy.strength);
+      }
+
+      if(flamethrower.flameActive && this.checkFlamethrowerOverlap(enemy))
+      {
+        enemy.subtractHealth(player.strength);
+      }
+      enemy.touchingPlayer = false;
+      enemy.touchingFlamethrower = false;
+    }
+  }
+
+  checkOverlap(obj1, obj2)
+  {
+    let intersect = Phaser.Geom.Rectangle.Intersection(obj1.getBounds(), obj2.getBounds());
+    return !(intersect.width === 0 && intersect.height === 0);
+  }
+
+  checkFlamethrowerOverlap(enemy)
+  {
+    return this.checkOverlap(enemy, this.gameStateObj.player.flamethrower);
+  }
+
+
 }

@@ -9,13 +9,15 @@ export default class Flamethrower extends Phaser.Physics.Arcade.Sprite
     this.direction = player.direction;
     this.player = player;
 
-    this.active = false;
+    this.flameActive = false;
     this.maxFuel = 100;
     this.fuel = this.maxFuel;
 
     scene.add.existing(this);
     scene.physics.add.existing(this);
 
+    // Timer is for handling the subtraction / adding
+    // of fuel. We use a timer event so it's frame indep.
     this.fuelTimerConfig = {
       delay: 17,
       callback: ( () => this._updateFuel(scene) ),
@@ -24,7 +26,13 @@ export default class Flamethrower extends Phaser.Physics.Arcade.Sprite
     this.fuelTimer = new Phaser.Time.TimerEvent(this.fuelTimerConfig);
     scene.time.addEvent(this.fuelTimer);
 
-    this.setOrigin(0,0);
+    // For "rotation"
+    this.dimensions = {
+      width: 96,
+      height: 32
+    }
+
+    // this.setOrigin(0,0);
   }
 
   handle(scene)
@@ -43,25 +51,25 @@ export default class Flamethrower extends Phaser.Physics.Arcade.Sprite
 
   _isActive()
   {
-    return this.active;
+    return this.flameActive;
   }
 
   _setActive(b)
   {
     // Turning on.
-    if(this.active === false && b === true)
+    if(this.flameActive === false && b === true)
     {
       this.anims.play('flamethrower_startup');
       this.anims.chain('flamethrower_firing');
     }
     // Turning off.
-    else if(this.active === true && b === false)
+    else if(this.flameActive === true && b === false)
     {
       this.anims.chain();
       this.anims.stop();
     }
 
-    this.active = b;
+    this.flameActive = b;
   }
 
   static loadAnims(scene)
@@ -101,7 +109,6 @@ export default class Flamethrower extends Phaser.Physics.Arcade.Sprite
           angle = 0
       }
       this.angle = angle;
-      this.body.angle = angle;
     }
 
     _updatePosition()
@@ -109,28 +116,40 @@ export default class Flamethrower extends Phaser.Physics.Arcade.Sprite
       let position = this.player.getTopLeft();
 
       // Don't try to think about these values too much.
-      // I based them on the og code and they looked pretty arbitrary
-      // at a quick glance.
-      // Rotation also messes with the positioning I think too so we
-      // gotta account for that as well.
+      // They are hardcoded based on trial and error to be
+      // identical to the og positioning.
+
+      let width;
+      let height;
       switch(this.player.direction)
       {
         case 'up':
           // Current position is fine.
+          width = this.dimensions.height;
+          height = this.dimensions.width;
+          position.x += 16;
+          position.y -= 48;
           break;
         case 'down':
-          position.x += 32;
-          position.y += 32;
+          width = this.dimensions.height;
+          height = this.dimensions.width;
+          position.x += 16;
+          position.y += 80;
           break;
         case 'left':
-          position.x -= 96;
-          position.y += 3;
+          width = this.dimensions.width;
+          height = this.dimensions.height;
+          position.x -= 48;
+          position.y += 19;
           break;
         default: // right.
-          position.x += 32;
-          position.y += 3;
+          width = this.dimensions.width;
+          height = this.dimensions.height;
+          position.x += 80;
+          position.y += 19;
         }
       this.setPosition(position.x, position.y);
+      this.body.setSize(width, height);
     }
 
     _updateFuel(scene)

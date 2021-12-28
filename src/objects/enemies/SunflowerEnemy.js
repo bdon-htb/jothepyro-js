@@ -8,10 +8,11 @@ export default class SunflowerEnemy extends Character
   {
     super(scene, x, y, 'sunflower_enemy');
 
+    this.strength = 0.7;
     this.speed = 330;
     this.setMaxHealth(45);
 
-    this.sprinting = false;    
+    this.sprinting = false;
     this.sprintTimer = new Phaser.Time.TimerEvent({
       delay: 250,
       callback: ( () => this.sprinting = !this.sprinting ),
