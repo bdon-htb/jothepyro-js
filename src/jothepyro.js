@@ -3,6 +3,8 @@ import Phaser from 'phaser';
 // Scenes.
 import PreloadScene from '/scenes/PreloadScene';
 import MainScene from '/scenes/MainScene';
+import TitleScene from '/scenes/TitleScene';
+import GameOverScene from '/scenes/GameOverScene';
 
 // Characters.
 import Player from '/objects/Player';
@@ -27,7 +29,7 @@ class JoThePyro extends Phaser.Game
         default: 'arcade',
         arcade : { debug: true }
       },
-      scene: [PreloadScene, MainScene]
+      scene: [PreloadScene, MainScene, TitleScene, GameOverScene]
     });
 
     this.controller = new Controller(this);

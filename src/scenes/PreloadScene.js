@@ -4,7 +4,8 @@ import Campfire from '../objects/Campfire';
 import Flamethrower from '../objects/Flamethrower';
 
 /**
- * Preload state loads in all the assets before the game starts.
+ * PreloadScene loads in all the assets before the game starts.
+ * Only thing it displays is a loading screen.
 */
 export default class PreloadScene extends Phaser.Scene
 {
@@ -15,6 +16,9 @@ export default class PreloadScene extends Phaser.Scene
 
   preload ()
   {
+
+    this.setupProgressBar();
+
     this.load.image('bg', 'assets/background.png');
     this.load.image('tent', 'assets/tent.png');
     this.load.image('treesD', 'assets/bg_treesD.png');
@@ -42,8 +46,43 @@ export default class PreloadScene extends Phaser.Scene
       { frameWidth: 32, frameHeight: 32 }
     );
 
-    this.load.atlas('ui', 'assets/ui/ui.png', 'assets/ui/ui.json');
+    this.load.atlas('ui', 'assets/ui.png', 'assets/ui.json');
+    this.load.image('player_gameover', 'assets/player_gameover.png');
     // this.load.atlas('items', 'assets/items/items.png', 'assets/items/ui.items');
+  }
+
+  // I shamelessly copied this from here.
+  // https://gamedevacademy.org/creating-a-preloading-screen-in-phaser-3/#Creating_the_Preloader
+  setupProgressBar()
+  {
+    let progressBar = this.add.graphics();
+    let progressBox = this.add.graphics();
+    progressBox.fillStyle(0x222222, 0.8);
+    progressBox.fillRect(240, 270, 320, 30);
+
+    let loadingText = this.make.text({
+        x: 400,
+        y: 250,
+        text: 'Loading...',
+        style: {
+            font: '23px Arial',
+            fill: '#FFFFFF'
+        }
+    });
+
+    loadingText.setOrigin(0.5, 0.5);
+
+    this.load.on('progress', function(value){
+      progressBar.clear();
+      progressBar.fillStyle(0xffffff, 1);
+      progressBar.fillRect(250, 280, 300 * value, 10);
+    });
+
+    this.load.on('complete', function(){
+      progressBar.destroy();
+      progressBox.destroy();
+      loadingText.destroy();
+    });
   }
 
   create ()
@@ -53,6 +92,6 @@ export default class PreloadScene extends Phaser.Scene
     }
     Campfire.loadAnims(this);
     Flamethrower.loadAnims(this);
-    this.scene.start('main');
+    this.scene.start('gameOver');
   }
 }

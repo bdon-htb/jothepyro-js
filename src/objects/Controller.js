@@ -28,6 +28,8 @@ export default class Controller
   {
     // Remove all listeners from previous scene if they exist.
     this._removeListeners();
+    // Clear command stack.
+    this._commandStack = [];
 
     this.scene = scene;
     this._setListeners();

@@ -32,13 +32,6 @@ export default class MainScene extends Phaser.Scene
     // Midground; Player is added to the stage here.
     this.initGameStateObj();
 
-    // Debug stuff.
-    // this.spawnEnemy(this.game.characters.RoseEnemy, 75, 300);
-    // this.spawnEnemy(new this.game.characters.TreeEnemy({ scene: this, x: 720, y: 300 }));
-    // this.spawnEnemy(new this.game.characters.BoxEnemy({ scene: this, x: 300, y: 80 }));
-    // this.spawnEnemy(new this.game.characters.SunflowerEnemy({ scene: this, x: 300, y: 400 }));
-    // this.spawnEnemy(new this.game.characters.WatermelonEnemy({ scene: this, x: 500, y: 500 }));
-
     // Add foreground components.
     this.createForeground();
 
@@ -64,8 +57,11 @@ export default class MainScene extends Phaser.Scene
   update()
   {
     // Handle player.
-    this.gameStateObj.player.handle(this);
-    this.gameStateObj.healthBar.setValue(this.gameStateObj.player.health);
+    let player = this.gameStateObj.player;
+    player.handle(this);
+    this.gameStateObj.healthBar.setValue(player.health);
+
+    if(this.characterIsDead(player)){ this.gameOver(); }
 
     // Handle enemies.
     for(const enemy of this.getAllEnemies())
@@ -73,6 +69,8 @@ export default class MainScene extends Phaser.Scene
       if(this.characterIsDead(enemy))
       {
         this.killEnemy(enemy);
+        this.incrementScore(enemy);
+        this.updateDifficulty();
         continue;
       }
 
@@ -138,6 +136,10 @@ export default class MainScene extends Phaser.Scene
     else if(chance >= 67 && chance <= 87) // 21/100
     {
       enemyClass = this.game.characters.WatermelonEnemy;
+    }
+    else if(chance >= 88 && chance <= 99) // 11/100
+    {
+      enemyClass = this.game.characters.TreeEnemy;
     }
     else enemyClass = this.game.characters.BoxEnemy; // 1 / 100
 
@@ -347,6 +349,7 @@ export default class MainScene extends Phaser.Scene
   incrementScore(enemy)
   {
     this.gameStateObj.score += Math.floor(this.gameStateObj.baseAddition + (enemy.maxHealth / 2));
+    this.gameStateObj.scoreText.setText(this.gameStateObj.score);
   }
 
   updateDifficulty()
@@ -368,5 +371,10 @@ export default class MainScene extends Phaser.Scene
         gameStateObj.consumSpawnRate += 1;
       }
     }
+  }
+
+  gameOver()
+  {
+    this.scene.start('gameOver');
   }
 }
