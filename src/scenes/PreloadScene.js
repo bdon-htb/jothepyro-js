@@ -92,6 +92,6 @@ export default class PreloadScene extends Phaser.Scene
     }
     Campfire.loadAnims(this);
     Flamethrower.loadAnims(this);
-    this.scene.start('gameOver');
+    this.scene.start('title');
   }
 }

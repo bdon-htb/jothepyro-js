@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 
 import HealthBar from '../objects/HealthBar';
-import Projectile from '../objects/Projectile'
+import Projectile from '../objects/Projectile';
 
 import Campfire from '../objects/Campfire';
 
@@ -234,6 +234,7 @@ export default class MainScene extends Phaser.Scene
     this.background.create(0, 0, 'bg').setOrigin(0,0);
     this.background.create(400, 150, 'tent').setOrigin(0,0);
     this.background.add(new Campfire({ scene: this, x: 355, y: 215 }));
+    this.background.setDepth(0);
   }
 
   createForeground()
@@ -243,6 +244,7 @@ export default class MainScene extends Phaser.Scene
     this.foreground.create(-22, 0, 'treesL').setOrigin(0,0);
     this.foreground.create(768, 0, 'treesR').setOrigin(0,0);
     this.foreground.create(0, 546, 'treesD').setOrigin(0,0);
+    this.foreground.setDepth(3);
   }
 
   createUI()
@@ -254,6 +256,7 @@ export default class MainScene extends Phaser.Scene
     this.ui.add(this.gameStateObj.fuelBar, true);
     this.ui.create(110, 0, 'ui', 'fuelbar.png').setOrigin(0,0);
     this.ui.add(this.gameStateObj.scoreText, true);
+    this.ui.setDepth(4);
   }
 
   initGameStateObj()
@@ -274,6 +277,10 @@ export default class MainScene extends Phaser.Scene
       consumSpawnRate: 2, // Denom. 1/2
       killStreak: false
     }
+
+    player.setDepth(1);
+    // Projectiles appear over enemies. but under foreground.
+    this.gameStateObj.projectiles.setDepth(2);
   }
 
   createEnemiesGroup()
@@ -284,6 +291,7 @@ export default class MainScene extends Phaser.Scene
     {
       if(enemyClass === this.game.characters.Player){ continue; }
       enemies[enemyClass] = this.physics.add.group();
+      enemies[enemyClass].setDepth(1); // Same depth as player.
     }
     return enemies;
   }
@@ -375,6 +383,9 @@ export default class MainScene extends Phaser.Scene
 
   gameOver()
   {
-    this.scene.start('gameOver');
+    this.scene.start('gameOver', {
+      finalScore: this.gameStateObj.score,
+      isNewRecord: this.game.updateHighScore(this.gameStateObj.score)
+    });
   }
 }

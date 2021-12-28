@@ -34,6 +34,9 @@ class JoThePyro extends Phaser.Game
 
     this.controller = new Controller(this);
 
+    this.highScore;
+    this.loadHighScore();
+
     // Create a reference to all the existing character classes.
     this.characters = {
       Player: Player,
@@ -43,7 +46,36 @@ class JoThePyro extends Phaser.Game
       SunflowerEnemy: SunflowerEnemy,
       WatermelonEnemy: WatermelonEnemy
     }
+  }
 
+  loadHighScore()
+  {
+    this.highScore = localStorage.getItem('highScore');
+    if(this.highScore == null)
+    {
+      this.highScore = 0;
+    }
+  }
+
+  getHighScore()
+  {
+    return this.highScore;
+  }
+
+  updateHighScore(score)
+  {
+    if(score > this.highScore)
+    {
+      this.highScore = score;
+      localStorage.setItem('highScore', this.highScore);
+      return true;
+    }
+    return false;
+  }
+
+  clearHighScore()
+  {
+    localStorage.removeItem('highScore');
   }
 }
 
