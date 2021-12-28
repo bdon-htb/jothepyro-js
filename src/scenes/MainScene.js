@@ -5,6 +5,8 @@ import Projectile from '../objects/Projectile'
 
 import Campfire from '../objects/Campfire';
 
+import randomInt from '../funcs.js';
+
 /**
  * Play state handles the actual playing of the game.
 */
@@ -14,8 +16,10 @@ export default class MainScene extends Phaser.Scene
   {
     super('main');
 
-    this.background; // Phaser.Physics.Arcade.Group containing background imagery (i.e. grass, tent, etc).
-    this.foreground; // Phaser.Physics.Arcade.Group containing foreground imager (i.e. forest).
+    // Phaser.Physics.Arcade.Group containing background imagery (i.e. grass, tent, etc).
+    this.background;
+    // Phaser.Physics.Arcade.Group containing foreground imager (i.e. forest).
+    this.foreground;
   }
 
   create()
@@ -29,11 +33,11 @@ export default class MainScene extends Phaser.Scene
     this.initGameStateObj();
 
     // Debug stuff.
-    // this.spawnEnemy(new this.game.characters.RoseEnemy({ scene: this, x: 75, y: 300 }));
+    // this.spawnEnemy(this.game.characters.RoseEnemy, 75, 300);
     // this.spawnEnemy(new this.game.characters.TreeEnemy({ scene: this, x: 720, y: 300 }));
     // this.spawnEnemy(new this.game.characters.BoxEnemy({ scene: this, x: 300, y: 80 }));
     // this.spawnEnemy(new this.game.characters.SunflowerEnemy({ scene: this, x: 300, y: 400 }));
-    this.spawnEnemy(new this.game.characters.WatermelonEnemy({ scene: this, x: 500, y: 500 }));
+    // this.spawnEnemy(new this.game.characters.WatermelonEnemy({ scene: this, x: 500, y: 500 }));
 
     // Add foreground components.
     this.createForeground();
@@ -41,51 +45,158 @@ export default class MainScene extends Phaser.Scene
     // Add ui components.
     this.createUI();
 
-    // for collision detection.
-    // this.physics.world.on('overlap', this.handleOverlap)
     this.physics.world.on('worldbounds', this.handleBoundCollision);
 
-    this.damageTimerConfig = {
+    // Setup damage timer. Every 1/60th of a second we check for
+    // damage-related collisions.
+    this.fixedUpdateTimerConfig = {
       delay: 17,
-      callback: ( () => this.checkDamage() ),
+      callback: () => {
+        this.checkDamage();
+        this.handleEnemySpawn();
+      },
       repeat: -1
     }
-    this.damageTimer = new Phaser.Time.TimerEvent(this.damageTimerConfig);
-    this.time.addEvent(this.damageTimer);
+    this.fixedUpdateTimer = new Phaser.Time.TimerEvent(this.fixedUpdateTimerConfig);
+    this.time.addEvent(this.fixedUpdateTimer);
   }
 
   update()
   {
+    // Handle player.
     this.gameStateObj.player.handle(this);
     this.gameStateObj.healthBar.setValue(this.gameStateObj.player.health);
-    for(const enemy of this.gameStateObj.enemies.children.getArray())
+
+    // Handle enemies.
+    for(const enemy of this.getAllEnemies())
     {
+      if(this.characterIsDead(enemy))
+      {
+        this.killEnemy(enemy);
+        continue;
+      }
+
+      if(!enemy.insideMap && this.isInsideMap(enemy))
+      {
+        enemy.insideMap = true;
+        enemy.setCollideWorldBounds(true);
+      }
       enemy.handle(this);
       enemy.healthBar.setValue(enemy.health);
       enemy.healthBar.setPosition(enemy.body.left, enemy.body.top - 15);
     }
   }
 
-  spawnEnemy(enemy)
+  spawnEnemy(enemyClass, x, y)
   {
-    this.gameStateObj.enemies.add(enemy, true);
-    this.physics.add.existing(enemy);
+    let enemies = this.gameStateObj.enemies[enemyClass];
+    let enemy = enemies.getFirstDead();
+    if(enemy == null)
+    {
+      enemy = new enemyClass({ scene : this, x : x, y : y });
+      enemies.add(enemy, true);
+      this.physics.add.existing(enemy);
 
-    enemy.setCollideWorldBounds(true);
-    enemy.body.pushable = false;
+      enemy.healthBar = new HealthBar(
+        this, enemy.body.left, enemy.body.top - 15, enemy.width, 10, enemy.health);
+      this.add.existing(enemy.healthBar, true);
+      enemy.body.pushable = false;
+    }
+    else {
+      enemy.resetHealth();
+      enemy.setPosition(x, y);
+      enemy.setActive(true);
+      enemy.setVisible(true);
+
+      enemy.healthBar.reset();
+      enemy.healthBar.setActive(true);
+      enemy.healthBar.setVisible(true);
+    }
 
     enemy.touchingPlayer = false;
     enemy.touchingFlamethrower = false;
+    enemy.insideMap = false;
 
-    this.physics.add.collider(enemy, this.gameStateObj.player,
+    let c = this.physics.add.collider(enemy, this.gameStateObj.player,
       () => {enemy.touchingPlayer = true; });
 
-    enemy.healthBar = new HealthBar(
-      this, enemy.body.left, enemy.body.top - 15, enemy.width, 10, enemy.health);
-    this.add.existing(enemy.healthBar, true);
+    enemy.collider = c;
   }
 
-  setProjectile(x, y, texture, strength, velocityX, velocityY)
+  randomlySpawnEnemy()
+  {
+    let chance = randomInt(1, 100);
+    let enemyClass;
+    if(chance >= 1 && chance <= 50) // 51/100
+    {
+      enemyClass = this.game.characters.RoseEnemy;
+    }
+    else if(chance >= 51 && chance <= 66) // 16/100
+    {
+      enemyClass = this.game.characters.SunflowerEnemy;
+    }
+    else if(chance >= 67 && chance <= 87) // 21/100
+    {
+      enemyClass = this.game.characters.WatermelonEnemy;
+    }
+    else enemyClass = this.game.characters.BoxEnemy; // 1 / 100
+
+    let position = this.getEnemySpawnPosition();
+    this.spawnEnemy(enemyClass, position.x, position.y);
+  }
+
+  getEnemySpawnPosition()
+  {
+    let top = 0;
+    let left = 0;
+    let right = 800;
+    let bottom = 600;
+
+    let position = {}
+    position.x = randomInt(left - 50, right + 50);
+    if(position.x >= left && position.x <= right)
+    {
+      position.y = (randomInt(1, 2) == 1) ? bottom + 50 : top - 50;
+    }
+    else position.y = randomInt(top, bottom);
+
+    return position;
+  }
+
+  handleEnemySpawn()
+  {
+    if(randomInt(1, this.gameStateObj.enemySpawnRate) === 1)
+    {
+      this.randomlySpawnEnemy();
+    }
+  }
+
+  // Returns if the character is dead or not.
+  characterIsDead(c)
+  {
+    return c.health <= 0;
+  }
+
+  killEnemy(enemy)
+  {
+    enemy.setActive(false);
+    enemy.setVisible(false);
+    enemy.collider.destroy()
+    enemy.collider = null;
+    enemy.insideMap = false;
+
+    enemy.healthBar.setActive(false);
+    enemy.healthBar.setVisible(false);
+    enemy.setVelocity(0, 0);
+
+    // Gotta make sure watermelons don't keep shooting after death.
+    if(enemy instanceof this.game.characters.WatermelonEnemy)
+    {
+      enemy.turnOffTimer(this);
+    };
+  }
+
+  spawnProjectile(x, y, texture, strength, velocityX, velocityY)
   {
     let p = this.gameStateObj.projectiles.getFirstDead();
     if(p == null)
@@ -148,13 +259,45 @@ export default class MainScene extends Phaser.Scene
     let player = new this.game.characters.Player({ scene: this, x: 400, y: 400 });
     this.gameStateObj = {
       player: player,
-      enemies: this.physics.add.group(),
+      enemies: this.createEnemiesGroup(),
       projectiles: this.physics.add.group(),
       score: 0,
+      scoreThousand: 1,
       scoreText: new Phaser.GameObjects.Text(this, 661, 20, '0', {font: '23px Arial', fill: '#FFFFFF'}),
       healthBar: new HealthBar(this, 40, 20, 100, 24, player.health, 0xff0000, null),
-      fuelBar: new HealthBar(this, 160, 24, 100, 24, player.fuel, 0xF27D0C, null)
+      fuelBar: new HealthBar(this, 160, 24, 100, 24, player.fuel, 0xF27D0C, null),
+      maxEnemies: 10,
+      baseAddition: 10,
+      enemySpawnRate: 100, // Denom. 1/100
+      consumSpawnRate: 2, // Denom. 1/2
+      killStreak: false
     }
+  }
+
+  createEnemiesGroup()
+  {
+    let enemies = { };
+
+    for(const enemyClass of Object.values(this.game.characters))
+    {
+      if(enemyClass === this.game.characters.Player){ continue; }
+      enemies[enemyClass] = this.physics.add.group();
+    }
+    return enemies;
+  }
+
+  getAllEnemies()
+  {
+    let allEnemies = []
+    for(const [enemyClass, enemyGroup] of Object.entries(this.gameStateObj.enemies))
+    {
+      if(enemyClass === this.game.characters.Player){ continue; }
+      for(const enemy of enemyGroup.children.getArray())
+      {
+        if(enemy.active && enemy.visible){ allEnemies.push(enemy); }
+      }
+    }
+    return allEnemies;
   }
 
   handleBoundCollision(body)
@@ -169,7 +312,7 @@ export default class MainScene extends Phaser.Scene
   {
     let player = this.gameStateObj.player;
     let flamethrower = this.gameStateObj.player.flamethrower;
-    let enemies = this.gameStateObj.enemies.children.getArray();
+    let enemies = this.getAllEnemies()
 
     for(const enemy of enemies)
     {
@@ -178,7 +321,7 @@ export default class MainScene extends Phaser.Scene
         this.gameStateObj.player.subtractHealth(enemy.strength);
       }
 
-      if(flamethrower.flameActive && this.checkFlamethrowerOverlap(enemy))
+      if(flamethrower.flameActive && this.checkOverlap(enemy, this.gameStateObj.player.flamethrower))
       {
         enemy.subtractHealth(player.strength);
       }
@@ -193,10 +336,37 @@ export default class MainScene extends Phaser.Scene
     return !(intersect.width === 0 && intersect.height === 0);
   }
 
-  checkFlamethrowerOverlap(enemy)
+  isInsideMap(enemy)
   {
-    return this.checkOverlap(enemy, this.gameStateObj.player.flamethrower);
+    let enemyRect = enemy.getBounds();
+    let intersect = Phaser.Geom.Rectangle.Intersection(enemyRect, this.physics.world.bounds);
+    return intersect.width === enemyRect.width && intersect.height === enemyRect.height;
   }
 
+  // Increases score based on enemy defeated.
+  incrementScore(enemy)
+  {
+    this.gameStateObj.score += Math.floor(this.gameStateObj.baseAddition + (enemy.maxHealth / 2));
+  }
 
+  updateDifficulty()
+  {
+    let gameStateObj = this.gameStateObj;
+    // Pulling this directly from og calculateScore().
+    if(gameStateObj.maxEnemies < 100 && (gameStateObj.score / 500) >= gameStateObj.scoreThousand)
+    {
+      gameStateObj.max_enemies += 1;
+      gameStateObj.scoreThousand += 1;
+
+      if(gameStateObj.enemySpawnRate >= 25)
+      {
+        gameStateObj.enemySpawnRate -= 1;
+      }
+
+      if(gameStateObj.consumSpawnRate[1] <= 35)
+      {
+        gameStateObj.consumSpawnRate += 1;
+      }
+    }
+  }
 }

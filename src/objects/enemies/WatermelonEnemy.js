@@ -2,10 +2,7 @@ import Phaser from 'phaser';
 
 import Character from '../Character';
 
-function randomInt(min, max)
-{
-  return Math.floor(Math.random() * (max - min + 1) + min)
-}
+import randomInt from '../../funcs.js';
 
 export default class WatermelonEnemy extends Character
 {
@@ -57,8 +54,7 @@ export default class WatermelonEnemy extends Character
     {
       if(previous.firing) // turning off.
       {
-        scene.time.removeEvent(this.fireTimer);
-        this.fireTimer.reset(this.fireTimerConfig);
+        this.turnOffTimer(scene);
       }
       this.anims.play('watermelon_enemy_move', true);
       this._follow(scene, scene.gameStateObj.player);
@@ -77,6 +73,11 @@ export default class WatermelonEnemy extends Character
     this._updateColliders();
   }
 
+  turnOffTimer(scene)
+  {
+    scene.time.removeEvent(this.fireTimer);
+    this.fireTimer.reset(this.fireTimerConfig);
+  }
   static loadAssets(scene)
   {
     scene.load.spritesheet(
@@ -217,7 +218,7 @@ export default class WatermelonEnemy extends Character
         velocityX = this.seedSpeed;
     }
 
-    let p = scene.setProjectile(position.x, position.y, 'watermelon_seed', strength, velocityX, velocityY);
+    let p = scene.spawnProjectile(position.x, position.y, 'watermelon_seed', strength, velocityX, velocityY);
     p.setFrame(textureFrame);
   }
 }

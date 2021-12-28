@@ -43,6 +43,11 @@ export default class HealthBar extends Phaser.GameObjects.Graphics
     this._updateGraphic();
   }
 
+  reset()
+  {
+    this.setValue(this.maxValue);
+  }
+  
   _updateGraphic()
   {
     this.clear();
