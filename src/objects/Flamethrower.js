@@ -49,6 +49,16 @@ export default class Flamethrower extends Phaser.Physics.Arcade.Sprite
     this.direction = this.player.direction;
   }
 
+  addFuel(v)
+  {
+    this.fuel = Math.min(this.maxFuel, this.fuel + v);
+  }
+
+  subtractFuel(v)
+  {
+    this.fuel = Math.max(0, this.fuel - v);
+  }
+
   _isActive()
   {
     return this.flameActive;

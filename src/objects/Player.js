@@ -22,10 +22,21 @@ export default class Player extends Character
     this.firing = false;
     this.flamethrower = new Flamethrower({ scene: scene, x: x, y: y, player: this });
 
-    // These are the default values of the Character class.
-    // But i'll leave them here anyways.
     this.speed = 300;
+    this.isFast = false;
+    this.speedMultiplier = 1;
+    this.fastTimer = new Phaser.Time.TimerEvent();
+
     this.setMaxHealth(100);
+
+    this.strength = 1;
+    this.isStrong = false;
+    this.strengthMultiplier = 1;
+    this.strongTimer = new Phaser.Time.TimerEvent();
+
+    this.invincible = false;
+    this.invincibleTimer = new Phaser.Time.TimerEvent();
+
 
     this._setAnim();
 
@@ -47,9 +58,13 @@ export default class Player extends Character
     }
 
     this.flamethrower.handle(scene);
-
   }
 
+  subtractHealth(v)
+  {
+    if(!this.invincible){ super.subtractHealth(v); }
+  }
+  
   static loadAssets(scene)
   {
     scene.load.spritesheet(
@@ -152,6 +167,7 @@ export default class Player extends Character
   {
     let controller = scene.game.controller;
     let firing = false;
+    let speed = this.speed * this.speedMultiplier;
 
     this.state = 'idle';
     this.setVelocityX(0);
@@ -164,16 +180,16 @@ export default class Player extends Character
         switch (command)
         {
           case 'MOVE_UP':
-            this.setVelocityY(-this.speed);
+            this.setVelocityY(-speed);
             break;
           case 'MOVE_DOWN':
-            this.setVelocityY(this.speed);
+            this.setVelocityY(speed);
             break;
           case 'MOVE_LEFT':
-            this.setVelocityX(-this.speed);
+            this.setVelocityX(-speed);
             break;
           case 'MOVE_RIGHT':
-            this.setVelocityX(this.speed);
+            this.setVelocityX(speed);
             break;
         }
       }

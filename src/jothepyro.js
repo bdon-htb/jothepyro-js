@@ -14,6 +14,15 @@ import BoxEnemy from '/objects/enemies/BoxEnemy';
 import SunflowerEnemy from '/objects/enemies/SunflowerEnemy';
 import WatermelonEnemy from '/objects/enemies/WatermelonEnemy';
 
+// Consumables.
+import Bandages from '/objects/consumables/Bandages';
+import Barrel from '/objects/consumables/Barrel';
+import Medkit from '/objects/consumables/Medkit';
+import Pepper from '/objects/consumables/Pepper';
+import Propane from '/objects/consumables/Propane';
+import Steak from '/objects/consumables/Steak';
+import GoldenMask from '/objects/consumables/GoldenMask';
+
 // Custom components.
 import Controller from '/objects/Controller';
 
@@ -27,7 +36,7 @@ class JoThePyro extends Phaser.Game
       height: 600,
       physics: {
         default: 'arcade',
-        arcade : { debug: true }
+        arcade : { debug: false }
       },
       scene: [PreloadScene, MainScene, TitleScene, GameOverScene]
     });
@@ -45,6 +54,16 @@ class JoThePyro extends Phaser.Game
       BoxEnemy: BoxEnemy,
       SunflowerEnemy: SunflowerEnemy,
       WatermelonEnemy: WatermelonEnemy
+    }
+
+    this.consumables = {
+      Bandages: Bandages,
+      Medkit: Medkit,
+      Propane: Propane,
+      Barrel: Barrel,
+      Pepper: Pepper,
+      Steak: Steak,
+      GoldenMask: GoldenMask
     }
   }
 

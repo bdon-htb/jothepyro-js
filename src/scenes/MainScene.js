@@ -57,7 +57,7 @@ export default class MainScene extends Phaser.Scene
   update()
   {
     // Handle player.
-    let player = this.gameStateObj.player;
+    let player = this.getPlayer();
     player.handle(this);
     this.gameStateObj.healthBar.setValue(player.health);
 
@@ -115,8 +115,8 @@ export default class MainScene extends Phaser.Scene
     enemy.touchingFlamethrower = false;
     enemy.insideMap = false;
 
-    let c = this.physics.add.collider(enemy, this.gameStateObj.player,
-      () => {enemy.touchingPlayer = true; });
+    let c = this.physics.add.collider(enemy, this.getPlayer(),
+      () => { enemy.touchingPlayer = true; });
 
     enemy.collider = c;
   }
@@ -198,6 +198,29 @@ export default class MainScene extends Phaser.Scene
     };
   }
 
+  spawnConsumable(consumClass, x, y)
+  {
+    let consumables = this.gameStateObj.consumables[consumClass];
+    let consum = consumables.getFirstDead();
+    if(consum == null)
+    {
+      consum = new consumClass({ scene: this, x : x, y: y });
+      consumables.add(consum, true);
+      this.physics.add.existing(consum);
+    }
+    else {
+      consum.setPosition(x, y);
+      consum.activate();
+    }
+
+    let o = this.physics.add.overlap(consum, this.getPlayer(),
+      () => {
+        consum.consume(this, this.getPlayer());
+        consum.deactivate();
+      })
+    consum.overlap = o;
+  }
+
   spawnProjectile(x, y, texture, strength, velocityX, velocityY)
   {
     let p = this.gameStateObj.projectiles.getFirstDead();
@@ -218,9 +241,9 @@ export default class MainScene extends Phaser.Scene
     p.body.onWorldBounds = true;
     p.setCollideWorldBounds(true);
 
-    let c = this.physics.add.collider(p, this.gameStateObj.player,
+    let c = this.physics.add.collider(p, this.getPlayer(),
       () => {
-        this.gameStateObj.player.subtractHealth(p.getStrength());
+        this.getPlayer().subtractHealth(p.getStrength());
         p.deactivate();
       });
 
@@ -266,6 +289,7 @@ export default class MainScene extends Phaser.Scene
       player: player,
       enemies: this.createEnemiesGroup(),
       projectiles: this.physics.add.group(),
+      consumables: this.createConsumablesGroup(),
       score: 0,
       scoreThousand: 1,
       scoreText: new Phaser.GameObjects.Text(this, 661, 20, '0', {font: '23px Arial', fill: '#FFFFFF'}),
@@ -279,8 +303,14 @@ export default class MainScene extends Phaser.Scene
     }
 
     player.setDepth(1);
+    player.flamethrower.setDepth(2);
     // Projectiles appear over enemies. but under foreground.
     this.gameStateObj.projectiles.setDepth(2);
+  }
+
+  getPlayer()
+  {
+    return this.gameStateObj.player;
   }
 
   createEnemiesGroup()
@@ -310,6 +340,18 @@ export default class MainScene extends Phaser.Scene
     return allEnemies;
   }
 
+  createConsumablesGroup()
+  {
+    let consumables = { };
+
+    for(const consumClass of Object.values(this.game.consumables))
+    {
+      consumables[consumClass] = this.physics.add.group();
+      consumables[consumClass].setDepth(1); // Same depth as player.
+    }
+    return consumables;
+  }
+
   handleBoundCollision(body)
   {
     if(body.gameObject instanceof Projectile)
@@ -320,20 +362,20 @@ export default class MainScene extends Phaser.Scene
 
   checkDamage()
   {
-    let player = this.gameStateObj.player;
-    let flamethrower = this.gameStateObj.player.flamethrower;
+    let player = this.getPlayer();
+    let flamethrower = this.getPlayer().flamethrower;
     let enemies = this.getAllEnemies()
 
     for(const enemy of enemies)
     {
       if(enemy.touchingPlayer)
       {
-        this.gameStateObj.player.subtractHealth(enemy.strength);
+        this.getPlayer().subtractHealth(enemy.strength);
       }
 
-      if(flamethrower.flameActive && this.checkOverlap(enemy, this.gameStateObj.player.flamethrower))
+      if(flamethrower.flameActive && this.checkOverlap(enemy, this.getPlayer().flamethrower))
       {
-        enemy.subtractHealth(player.strength);
+        enemy.subtractHealth(player.strength * player.strengthMultiplier);
       }
       enemy.touchingPlayer = false;
       enemy.touchingFlamethrower = false;

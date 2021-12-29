@@ -16,7 +16,6 @@ export default class PreloadScene extends Phaser.Scene
 
   preload ()
   {
-
     this.setupProgressBar();
 
     this.load.image('bg', 'assets/background.png');
@@ -48,7 +47,8 @@ export default class PreloadScene extends Phaser.Scene
 
     this.load.atlas('ui', 'assets/ui.png', 'assets/ui.json');
     this.load.image('player_gameover', 'assets/player_gameover.png');
-    // this.load.atlas('items', 'assets/items/items.png', 'assets/items/ui.items');
+  
+    this.load.atlas('items', 'assets/items.png', 'assets/items.json');
   }
 
   // I shamelessly copied this from here.

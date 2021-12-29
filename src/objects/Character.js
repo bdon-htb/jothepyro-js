@@ -54,7 +54,7 @@ export default class Character extends Phaser.Physics.Arcade.Sprite
 
   addHealth(v)
   {
-    this.health = Math.min(this.maxHealth, this.health + 1);
+    this.health = Math.min(this.maxHealth, this.health + v);
   }
 
   /**
