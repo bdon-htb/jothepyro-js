@@ -4,7 +4,7 @@ export default class Medkit extends Consumable
 {
   constructor({ scene, x, y })
   {
-    super(scene, x, y, 'items', 'bandages.png');
+    super(scene, x, y, 'items', 'medkit.png');
     this.amount = 50;
   }
 

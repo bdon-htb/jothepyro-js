@@ -26,22 +26,9 @@ export default class MainScene extends Phaser.Scene
   {
     this.game.controller.init(this);
 
-    // Add background components.
-    this.createBackground();
-
-    // Midground; Player is added to the stage here.
-    this.initGameStateObj();
-
-    // Add foreground components.
-    this.createForeground();
-
-    // Add ui components.
-    this.createUI();
-
+    this.initGame();
     this.physics.world.on('worldbounds', this.handleBoundCollision);
 
-    // Setup damage timer. Every 1/60th of a second we check for
-    // damage-related collisions.
     this.fixedUpdateTimerConfig = {
       delay: 17,
       callback: () => {
@@ -50,6 +37,10 @@ export default class MainScene extends Phaser.Scene
       },
       repeat: -1
     }
+
+    this.spawnConsumable(this.game.consumables.GoldenMask, 200, 300);
+    this.spawnConsumable(this.game.consumables.Pepper, 250, 300);
+    this.spawnConsumable(this.game.consumables.Steak, 280, 300);
     this.fixedUpdateTimer = new Phaser.Time.TimerEvent(this.fixedUpdateTimerConfig);
     this.time.addEvent(this.fixedUpdateTimer);
   }
@@ -83,6 +74,133 @@ export default class MainScene extends Phaser.Scene
       enemy.healthBar.setValue(enemy.health);
       enemy.healthBar.setPosition(enemy.body.left, enemy.body.top - 15);
     }
+
+    // Handle display stuff.
+    if(player.isFast || player.isStrong || player.invincible)
+    {
+      this.gameStateObj.emptyBar.setVisible(true);
+    } else this.gameStateObj.emptyBar.setVisible(false);
+    this.gameStateObj.displayPepper.setVisible(player.isFast);
+    this.gameStateObj.displaySteak.setVisible(player.isStrong);
+    this.gameStateObj.displayMask.setVisible(player.invincible);
+
+  }
+
+  initGame()
+  {
+    let player = new this.game.characters.Player({ scene: this, x: 400, y: 400 });
+
+    this.gameStateObj = {
+      background: this.add.group(),
+      foreground: this.add.group(),
+      ui: this.add.group(),
+      player: player,
+      enemies: this.createEnemiesGroup(),
+      projectiles: this.physics.add.group(),
+      consumables: this.createConsumablesGroup(),
+      score: 0,
+      scoreThousand: 1,
+      scoreText: new Phaser.GameObjects.Text(this, 661, 20, '0', {font: '23px Arial', fill: '#FFFFFF'}),
+      healthBar: new HealthBar(this, 40, 20, 100, 24, player.health, 0xff0000, null),
+      fuelBar: new HealthBar(this, 160, 24, 100, 24, player.fuel, 0xF27D0C, null),
+      emptyBar: new Phaser.GameObjects.Sprite(this, 34, 50, 'ui', 'emptybar.png').setOrigin(0, 0),
+      displayPepper: new Phaser.GameObjects.Sprite(this, 53, 65, 'items', 'pepper.png'),
+      displaySteak: new Phaser.GameObjects.Sprite(this, 88, 65, 'items', 'steak.png'),
+      displayMask: new Phaser.GameObjects.Sprite(this, 123, 65, 'items', 'golden_mask.png'),
+      maxEnemies: 10,
+      baseAddition: 10,
+      enemySpawnRate: 100, // Denom. 1/100
+      consumSpawnRate: 2, // Denom. 1/2
+      killStreak: false,
+      killStreakDisplay: new Phaser.GameObjects.Sprite(this, 647, 50, 'ui', 'killstreak.png').setOrigin(0, 0),
+    }
+
+    this.setupBackground();
+    this.setupForeground();
+    this.setupUI();
+
+    player.setDepth(1);
+    player.flamethrower.setDepth(2);
+    this.gameStateObj.projectiles.setDepth(2);
+  }
+
+  setupBackground()
+  {
+    let background = this.gameStateObj.foreground;
+    background = this.add.group();
+    background.create(0, 0, 'bg').setOrigin(0,0);
+    background.create(400, 150, 'tent').setOrigin(0,0);
+    background.add(new Campfire({ scene: this, x: 355, y: 215 }));
+    background.setDepth(0);
+  }
+
+  setupForeground()
+  {
+    let foreground = this.gameStateObj.foreground;
+    foreground = this.add.group();
+    foreground.create(0, -10, 'treesU').setOrigin(0,0);
+    foreground.create(-22, 0, 'treesL').setOrigin(0,0);
+    foreground.create(768, 0, 'treesR').setOrigin(0,0);
+    foreground.create(0, 546, 'treesD').setOrigin(0,0);
+    foreground.setDepth(3);
+  }
+
+  setupUI()
+  {
+    let ui = this.gameStateObj.ui;
+    ui.create(632, 2, 'ui', 'score.png').setOrigin(0,0);
+    ui.add(this.gameStateObj.healthBar, true);
+    ui.create(-10, 0, 'ui', 'healthbar.png').setOrigin(0,0);
+    ui.add(this.gameStateObj.fuelBar, true);
+    ui.create(110, 0, 'ui', 'fuelbar.png').setOrigin(0,0);
+    ui.add(this.gameStateObj.scoreText, true);
+    ui.add(this.gameStateObj.emptyBar, true);
+    ui.add(this.gameStateObj.displayPepper, true);
+    ui.add(this.gameStateObj.displayMask, true);
+    ui.add(this.gameStateObj.displaySteak, true);
+    ui.setDepth(4);
+  }
+
+  getPlayer()
+  {
+    return this.gameStateObj.player;
+  }
+
+  characterIsDead(c)
+  {
+    return c.health <= 0;
+  }
+
+  /*
+   * =====================
+   * ENEMY RELATED METHODS
+   * =====================
+  */
+  createEnemiesGroup()
+  {
+    let enemies = { };
+
+    for(const enemyClass of Object.values(this.game.characters))
+    {
+      if(enemyClass === this.game.characters.Player){ continue; }
+      enemies[enemyClass] = this.physics.add.group();
+      enemies[enemyClass].setDepth(1); // Same depth as player.
+    }
+    return enemies;
+  }
+
+  getAllEnemies()
+  {
+    let allEnemies = []
+    for(const [enemyClass, enemyGroup] of Object.entries(this.gameStateObj.enemies))
+    {
+      if(enemyClass === this.game.characters.Player){ continue; }
+      for(const enemy of enemyGroup.children.getArray())
+      {
+        if(enemy.active && enemy.visible){ allEnemies.push(enemy); }
+      }
+    }
+    return allEnemies;
   }
 
   spawnEnemy(enemyClass, x, y)
@@ -173,12 +291,6 @@ export default class MainScene extends Phaser.Scene
     }
   }
 
-  // Returns if the character is dead or not.
-  characterIsDead(c)
-  {
-    return c.health <= 0;
-  }
-
   killEnemy(enemy)
   {
     enemy.setActive(false);
@@ -196,6 +308,25 @@ export default class MainScene extends Phaser.Scene
     {
       enemy.turnOffTimer(this);
     };
+
+    this.handleConsumableSpawn(enemy.x, enemy.y);
+  }
+
+  /*
+   * ==========================
+   * CONSUMABLE RELATED METHODS
+   * ==========================
+  */
+  createConsumablesGroup()
+  {
+    let consumables = { };
+
+    for(const consumClass of Object.values(this.game.consumables))
+    {
+      consumables[consumClass] = this.physics.add.group();
+      consumables[consumClass].setDepth(1); // Same depth as player.
+    }
+    return consumables;
   }
 
   spawnConsumable(consumClass, x, y)
@@ -221,6 +352,52 @@ export default class MainScene extends Phaser.Scene
     consum.overlap = o;
   }
 
+  handleConsumableSpawn(x, y)
+  {
+    if(randomInt(1, this.gameStateObj.consumSpawnRate) === 1)
+    {
+      this.randomlySpawnConsumable(x, y);
+    }
+  }
+
+  randomlySpawnConsumable(x, y)
+  {
+    let chance = randomInt(1, 100);
+    let consumClass;
+    if(chance >= 1 && chance <= 24) // 25/100
+    {
+      consumClass = this.game.consumables.Propane;
+    }
+    else if(chance >= 25 && chance <= 34) // 10/100
+    {
+      consumClass = this.game.consumables.Barrel;
+    }
+    else if(chance >= 35 && chance <= 54) // 20/100
+    {
+      consumClass = this.game.consumables.Bandages;
+    }
+    else if(chance >= 55 && chance <= 64) // 10/100
+    {
+      consumClass = this.game.consumables.Medkit;
+    }
+    else if(chance >= 65 && chance <= 79) // 15/100
+    {
+      consumClass = this.game.consumables.Pepper;
+    }
+    else if(chance >= 80 && chance <= 91) // 12/100
+    {
+      consumClass = this.game.consumables.Steak;
+    }
+    else consumClass = this.game.consumables.GoldenMask; // 8/100
+
+    this.spawnConsumable(consumClass, x, y);
+  }
+
+  /*
+   * ==========================
+   * PROJECTILE RELATED METHODS
+   * ==========================
+  */
   spawnProjectile(x, y, texture, strength, velocityX, velocityY)
   {
     let p = this.gameStateObj.projectiles.getFirstDead();
@@ -251,107 +428,11 @@ export default class MainScene extends Phaser.Scene
     return p;
   }
 
-  createBackground()
-  {
-    this.background = this.add.group();
-    this.background.create(0, 0, 'bg').setOrigin(0,0);
-    this.background.create(400, 150, 'tent').setOrigin(0,0);
-    this.background.add(new Campfire({ scene: this, x: 355, y: 215 }));
-    this.background.setDepth(0);
-  }
-
-  createForeground()
-  {
-    this.foreground = this.add.group();
-    this.foreground.create(0, -10, 'treesU').setOrigin(0,0);
-    this.foreground.create(-22, 0, 'treesL').setOrigin(0,0);
-    this.foreground.create(768, 0, 'treesR').setOrigin(0,0);
-    this.foreground.create(0, 546, 'treesD').setOrigin(0,0);
-    this.foreground.setDepth(3);
-  }
-
-  createUI()
-  {
-    this.ui = this.add.group();
-    this.ui.create(632, 2, 'ui', 'score.png').setOrigin(0,0);
-    this.ui.add(this.gameStateObj.healthBar, true);
-    this.ui.create(-10, 0, 'ui', 'healthbar.png').setOrigin(0,0);
-    this.ui.add(this.gameStateObj.fuelBar, true);
-    this.ui.create(110, 0, 'ui', 'fuelbar.png').setOrigin(0,0);
-    this.ui.add(this.gameStateObj.scoreText, true);
-    this.ui.setDepth(4);
-  }
-
-  initGameStateObj()
-  {
-    let player = new this.game.characters.Player({ scene: this, x: 400, y: 400 });
-    this.gameStateObj = {
-      player: player,
-      enemies: this.createEnemiesGroup(),
-      projectiles: this.physics.add.group(),
-      consumables: this.createConsumablesGroup(),
-      score: 0,
-      scoreThousand: 1,
-      scoreText: new Phaser.GameObjects.Text(this, 661, 20, '0', {font: '23px Arial', fill: '#FFFFFF'}),
-      healthBar: new HealthBar(this, 40, 20, 100, 24, player.health, 0xff0000, null),
-      fuelBar: new HealthBar(this, 160, 24, 100, 24, player.fuel, 0xF27D0C, null),
-      maxEnemies: 10,
-      baseAddition: 10,
-      enemySpawnRate: 100, // Denom. 1/100
-      consumSpawnRate: 2, // Denom. 1/2
-      killStreak: false
-    }
-
-    player.setDepth(1);
-    player.flamethrower.setDepth(2);
-    // Projectiles appear over enemies. but under foreground.
-    this.gameStateObj.projectiles.setDepth(2);
-  }
-
-  getPlayer()
-  {
-    return this.gameStateObj.player;
-  }
-
-  createEnemiesGroup()
-  {
-    let enemies = { };
-
-    for(const enemyClass of Object.values(this.game.characters))
-    {
-      if(enemyClass === this.game.characters.Player){ continue; }
-      enemies[enemyClass] = this.physics.add.group();
-      enemies[enemyClass].setDepth(1); // Same depth as player.
-    }
-    return enemies;
-  }
-
-  getAllEnemies()
-  {
-    let allEnemies = []
-    for(const [enemyClass, enemyGroup] of Object.entries(this.gameStateObj.enemies))
-    {
-      if(enemyClass === this.game.characters.Player){ continue; }
-      for(const enemy of enemyGroup.children.getArray())
-      {
-        if(enemy.active && enemy.visible){ allEnemies.push(enemy); }
-      }
-    }
-    return allEnemies;
-  }
-
-  createConsumablesGroup()
-  {
-    let consumables = { };
-
-    for(const consumClass of Object.values(this.game.consumables))
-    {
-      consumables[consumClass] = this.physics.add.group();
-      consumables[consumClass].setDepth(1); // Same depth as player.
-    }
-    return consumables;
-  }
-
+  /*
+   * =============
+   * MISC. METHODS
+   * =============
+  */
   handleBoundCollision(body)
   {
     if(body.gameObject instanceof Projectile)
