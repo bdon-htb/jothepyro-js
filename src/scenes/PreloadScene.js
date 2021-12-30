@@ -47,8 +47,12 @@ export default class PreloadScene extends Phaser.Scene
 
     this.load.atlas('ui', 'assets/ui.png', 'assets/ui.json');
     this.load.image('player_gameover', 'assets/player_gameover.png');
-  
+
     this.load.atlas('items', 'assets/items.png', 'assets/items.json');
+
+    this.load.audio('fight1', 'assets/audio/sawsquarenoise_stage_1.wav');
+    this.load.audio('fight2', 'assets/audio/sawsquarenoise_stage_2.wav');
+    this.load.audio('fight3', 'assets/audio/sawsquarenoise_stage_3.wav');
   }
 
   // I shamelessly copied this from here.

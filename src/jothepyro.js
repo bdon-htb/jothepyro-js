@@ -28,12 +28,13 @@ import Controller from '/objects/Controller';
 
 class JoThePyro extends Phaser.Game
 {
-  constructor()
+  constructor(canvas=null)
   {
     super({
       type: Phaser.AUTO,
       width: 800,
       height: 600,
+      canvas: canvas,
       physics: {
         default: 'arcade',
         arcade : { debug: false }
@@ -96,6 +97,11 @@ class JoThePyro extends Phaser.Game
   {
     localStorage.removeItem('highScore');
   }
+
+  toggleMute()
+  {
+    this.sound.mute = !this.sound.mute;
+  }
 }
 
-export default new JoThePyro();
+export default new JoThePyro(document.getElementById('JoThePyro'));

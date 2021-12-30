@@ -25,6 +25,16 @@ export default class MainScene extends Phaser.Scene
   create()
   {
     this.game.controller.init(this);
+    this.input.keyboard.on('keyup-M', () => this.game.toggleMute());
+
+    this.musicList = [
+      'fight1',
+      'fight2',
+      'fight3'
+    ]
+
+    this.music = this.sound.add(this.musicList[randomInt(0, this.musicList.length - 1)]);
+    this.music.play({ volume: 0.1, loop: true });
 
     this.initGame();
     this.physics.world.on('worldbounds', this.handleBoundCollision);
@@ -37,16 +47,22 @@ export default class MainScene extends Phaser.Scene
       },
       repeat: -1
     }
-
-    this.spawnConsumable(this.game.consumables.GoldenMask, 200, 300);
-    this.spawnConsumable(this.game.consumables.Pepper, 250, 300);
-    this.spawnConsumable(this.game.consumables.Steak, 280, 300);
     this.fixedUpdateTimer = new Phaser.Time.TimerEvent(this.fixedUpdateTimerConfig);
     this.time.addEvent(this.fixedUpdateTimer);
+
+    this.killStreakTimerConfig = {
+      delay: 6700,
+      callback: () => {
+        this.stopKillStreak();
+      },
+      repeat: 0
+    }
+    this.killStreakTimer = new Phaser.Time.TimerEvent(this.killStreakTimerConfig);
   }
 
   update()
   {
+
     // Handle player.
     let player = this.getPlayer();
     player.handle(this);
@@ -60,8 +76,10 @@ export default class MainScene extends Phaser.Scene
       if(this.characterIsDead(enemy))
       {
         this.killEnemy(enemy);
+        this.handleConsumableSpawn(enemy.x, enemy.y);
         this.incrementScore(enemy);
         this.updateDifficulty();
+        this.updateKillStreak();
         continue;
       }
 
@@ -80,9 +98,11 @@ export default class MainScene extends Phaser.Scene
     {
       this.gameStateObj.emptyBar.setVisible(true);
     } else this.gameStateObj.emptyBar.setVisible(false);
+
     this.gameStateObj.displayPepper.setVisible(player.isFast);
     this.gameStateObj.displaySteak.setVisible(player.isStrong);
     this.gameStateObj.displayMask.setVisible(player.invincible);
+    this.gameStateObj.killStreakDisplay.setVisible(this.gameStateObj.killStreak);
 
   }
 
@@ -112,6 +132,8 @@ export default class MainScene extends Phaser.Scene
       enemySpawnRate: 100, // Denom. 1/100
       consumSpawnRate: 2, // Denom. 1/2
       killStreak: false,
+      killStreakMark: 5,
+      killStreakCount: 0, // Kill count towards killstreak
       killStreakDisplay: new Phaser.GameObjects.Sprite(this, 647, 50, 'ui', 'killstreak.png').setOrigin(0, 0),
     }
 
@@ -158,6 +180,7 @@ export default class MainScene extends Phaser.Scene
     ui.add(this.gameStateObj.displayPepper, true);
     ui.add(this.gameStateObj.displayMask, true);
     ui.add(this.gameStateObj.displaySteak, true);
+    ui.add(this.gameStateObj.killStreakDisplay, true);
     ui.setDepth(4);
   }
 
@@ -308,8 +331,6 @@ export default class MainScene extends Phaser.Scene
     {
       enemy.turnOffTimer(this);
     };
-
-    this.handleConsumableSpawn(enemy.x, enemy.y);
   }
 
   /*
@@ -479,7 +500,9 @@ export default class MainScene extends Phaser.Scene
   // Increases score based on enemy defeated.
   incrementScore(enemy)
   {
-    this.gameStateObj.score += Math.floor(this.gameStateObj.baseAddition + (enemy.maxHealth / 2));
+    let baseAddition = this.gameStateObj.baseAddition;
+    if(this.gameStateObj.killStreak){ baseAddition *= this.gameStateObj.killStreakCount; }
+    this.gameStateObj.score += Math.floor(baseAddition + (enemy.maxHealth / 2));
     this.gameStateObj.scoreText.setText(this.gameStateObj.score);
   }
 
@@ -504,8 +527,43 @@ export default class MainScene extends Phaser.Scene
     }
   }
 
+  // Call this on enemy death.
+  updateKillStreak()
+  {
+    this.gameStateObj.killStreakCount += 1;
+
+    if(!this.gameStateObj.killStreak && this.gameStateObj.killStreakCount > this.gameStateObj.killStreakMark)
+    {
+      this.startKillStreak();
+    }
+    else if(this.gameStateObj.killStreak)
+    {
+      this.extendKillStreak();
+    }
+  }
+
+  extendKillStreak()
+  {
+    this.killStreakTimer.reset(this.killStreakTimerConfig);
+  }
+
+  startKillStreak()
+  {
+    this.gameStateObj.killStreak = true;
+    this.killStreakTimer.reset(this.killStreakTimerConfig);
+    this.time.addEvent(this.killStreakTimer);
+  }
+
+  stopKillStreak()
+  {
+    this.gameStateObj.killStreak = false;
+    this.gameStateObj.killStreakCount = 0;
+    this.time.removeEvent(this.killStreakTimer);
+  }
+
   gameOver()
   {
+    this.music.stop();
     this.scene.start('gameOver', {
       finalScore: this.gameStateObj.score,
       isNewRecord: this.game.updateHighScore(this.gameStateObj.score)

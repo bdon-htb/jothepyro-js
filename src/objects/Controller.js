@@ -83,7 +83,7 @@ export default class Controller
       'UP': 'AIM_UP',
       'DOWN': 'AIM_DOWN',
       'LEFT': 'AIM_LEFT',
-      'RIGHT': 'AIM_RIGHT'
+      'RIGHT': 'AIM_RIGHT',
     }
 
     for(const [key, value] of Object.entries(keys))
