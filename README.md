@@ -37,6 +37,9 @@ To run a development server:
 ```
 npm run start
 ```
+Then open your browser of choice (I suggest in private browsing), navigate to
+localhost:8100 to play
+
 To create a production build:
 ```
 npm run build
