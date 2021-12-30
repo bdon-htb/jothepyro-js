@@ -44,6 +44,11 @@ npm run build
 Where production files will be placed in the `dist` folder.
 
 ## Preview Images
+![Screenshot of Main Menu](https://github.com/bdon-htb/jothepyro-js/blob/main/preview_images/main_menu.png)
+
+![Gameplay Screenshot](https://github.com/bdon-htb/jothepyro-js/blob/main/preview_images/gameplay.png)
+
+![Game Over Screenshot](https://github.com/bdon-htb/jothepyro-js/blob/main/preview_images/game_over.png)
 
 ## Licensing
 Jo The Pyro is licensed under the GPL License which you can find [here](https://github.com/bdon-htb/jothepyro-js/blob/main/LICENSE)
